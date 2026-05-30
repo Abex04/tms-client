@@ -1,40 +1,22 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { ApiResponse, renderResponse } from "./models/api-response.model";
-import { Student } from "./models/student.model";
-import { Course } from "./models/course.model";
 
-// Test with ApiResponse<Student>
-const studentRes: ApiResponse<Student> = {
-  status: "success",
-  data: {
-    id: "STU-001",
-    name: "Dawit Bekele",
-    enrollmentDate: Temporal.Now.instant(),
-    gpa: 3.4,
-  },
-  fetchedAt: Temporal.Now.instant(),
-};
+// 1. Record the exact moment an enrollment is approved (UTC)
+const approvedAt = Temporal.Now.instant();
+console.log(`Approved at (UTC): ${approvedAt}`);
 
-console.log(
-  renderResponse(studentRes, (s) => `${s.name} GPA: ${s.gpa ?? "N/A"}`)
-);
+// 2. Display in local timezone — same moment, different wall-clock time
+const addisTime = approvedAt.toZonedDateTimeISO("Africa/Addis_Ababa");
+const londonTime = approvedAt.toZonedDateTimeISO("Europe/London");
+console.log(`Addis: ${addisTime.toPlainTime()}`);
+console.log(`London: ${londonTime.toPlainTime()}`);
 
-// Test with ApiResponse<Course[]>
-const courseListRes: ApiResponse<Course[]> = {
-  status: "success",
-  data: [
-    {
-      id: "CRS-101",
-      title: "Web Development Fundamentals",
-      capacity: 30,
-      startDate: Temporal.PlainDate.from("2026-09-01"),
-    },
-  ],
-  fetchedAt: Temporal.Now.instant(),
-};
+// 3. Course start date — date only, no time
+const courseStart = Temporal.PlainDate.from("2026-09-01");
+const today = Temporal.Now.plainDateISO();
+const daysUntilStart = today.until(courseStart).total({ unit: "days" });
+console.log(`${Math.floor(daysUntilStart)} days until course starts`);
 
-console.log(
-  renderResponse(courseListRes, (courses) =>
-    courses.map((c) => c.title).join(", ")
-  )
-);
+// 4. Assignment deadline duration
+const deadline = Temporal.PlainDate.from("2026-12-15");
+const remaining = today.until(deadline);
+console.log(`${remaining.total({ unit: "days" })} days until assignment is due`);
