@@ -1,21 +1,11 @@
 import { Temporal } from "@js-temporal/polyfill";
-import { AssessmentItem, calculateGrade } from "./models/assessment.model";
+import { EnrollmentStatus, describeEnrollment } from "./models/enrollment.model";
 
-const quiz: AssessmentItem = {
-  id: "QUIZ-001",
-  kind: "quiz",
-  title: "SQL Basics",
-  correctAnswers: 8,
-  totalQuestions: 10,
+const pending: EnrollmentStatus = {
+  status: "PENDING",
+  requestedAt: Temporal.Now.instant(),
+  studentId: "STU-001",
+  courseId: "CRS-101",
 };
 
-const lab: AssessmentItem = {
-  id: "LAB-001",
-  kind: "lab",
-  title: "REST API Project",
-  functionalityScore: 85,
-  codeQualityScore: 90,
-};
-
-console.log(`Quiz grade: ${calculateGrade(quiz)}%`);
-console.log(`Lab grade: ${calculateGrade(lab)}%`);
+console.log(describeEnrollment(pending));
