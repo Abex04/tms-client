@@ -25,6 +25,14 @@ export const routes: Routes = [
       .then(m => m.CourseDetailComponent),
   },
   {
+    // When the browser URL is /enroll, load the Enrollment Form component
+    path: 'enroll',
+
+    // Lazy load the Enrollment Form component only when this route is visited
+    loadComponent: () => import('./features/enrollment-form/enrollment-form.component')
+      .then(m => m.EnrollmentFormComponent),
+  },
+  {
     // Default route: if someone visits the root URL (http://localhost:4200/),
     // automatically send them to /dashboard
     path: '',

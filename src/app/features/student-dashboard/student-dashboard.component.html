@@ -17,23 +17,37 @@
   <!-- Course Catalog -->
   <h2>Course Catalog</h2>
 
-  @if (availableCourses().length === 0) {
-    <div class="empty-state">
-      <p>No courses are available this term. Check back during registration.</p>
+  <!-- Loading state: show while fetching data from the API -->
+  @if (coursesResource.isLoading()) {
+    <div class="spinner">
+      Fetching courses from the server...
     </div>
-  } @else {
+  }
+  <!-- Error state: show if the API request fails -->
+  @else if (coursesResource.error()) {
+    <div class="error">
+      Could not load courses. Make sure your .NET API is running.
+    </div>
+  }
+  <!-- Success state: courses loaded successfully -->
+  @else {
     <div class="grid">
-      @for (course of availableCourses(); track course.id) {
+      <!-- The ! after value() is TypeScript's non-null assertion operator -->
+      <!-- It tells TypeScript: "I know this value is not null at this point" -->
+      <!-- We can safely use it here because the @else block only runs after -->
+      <!-- isLoading() and error() are both false, meaning data has loaded -->
+      @for (course of coursesResource.value()!; track course.id) {
         <tms-course-card
           [course]="course"
           (enrollClicked)="handleEnroll($event)"
         />
       } @empty {
-        <p>No results match your search.</p>
+        <p>No courses are available this term.</p>
       }
     </div>
   }
 
+  <!-- Show selected course info after enrollment -->
   @if (selectedCourse(); as picked) {
     <div class="selection-hint">
       <p>Last enrollment request: <strong>{{ picked.title }}</strong> ({{ picked.code }})</p>
