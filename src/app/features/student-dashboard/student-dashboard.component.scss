@@ -1,0 +1,90 @@
+/* Dashboard component styles */
+.dashboard {
+  max-width: 64rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.dashboard h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.dashboard h2 {
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.dashboard .student-info {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.dashboard .student-info p {
+  color: #4b5563;
+  margin: 0.25rem 0;
+}
+
+.dashboard .student-info .status-eligible {
+  color: #16a34a;
+  font-weight: 600;
+}
+
+.dashboard .student-info .status-progress {
+  color: #ca8a04;
+  font-weight: 600;
+}
+
+.dashboard .btn-primary {
+  background: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  border: none;
+  cursor: pointer;
+  margin-top: 0.5rem;
+  transition: background 0.2s;
+}
+
+.dashboard .btn-primary:hover {
+  background: #2563eb;
+}
+
+.dashboard .grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+
+@media (min-width: 768px) {
+  .dashboard .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.dashboard .empty-state {
+  background: #fef3c7;
+  border: 1px solid #fcd34d;
+  border-radius: 0.5rem;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.dashboard .empty-state p {
+  color: #b45309;
+}
+
+.dashboard .selection-hint {
+  background: #dcfce7;
+  border: 1px solid #86efac;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  color: #166534;
+}

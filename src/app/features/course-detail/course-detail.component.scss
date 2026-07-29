@@ -1,0 +1,39 @@
+/* Course Detail component styles */
+.course-detail {
+  max-width: 42rem;
+  margin: 0 auto;
+  padding: 1.5rem;
+}
+
+.course-detail .card {
+  background: white;
+  border-radius: 0.5rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+}
+
+.course-detail h1 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #1f2937;
+  margin-bottom: 1rem;
+}
+
+.course-detail p {
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+}
+
+.course-detail .btn-back {
+  display: inline-block;
+  background: #3b82f6;
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.course-detail .btn-back:hover {
+  background: #2563eb;
+}
