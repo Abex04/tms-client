@@ -1,0 +1,25 @@
+<!-- Enrollment List Component -->
+<h2>Enrollment List</h2>
+<p>Course ID: {{ courseId() }}</p>
+
+<!-- Loading state -->
+@if (store.isLoading()) {
+  <p>Loading enrollments...</p>
+}
+
+<!-- Error state -->
+@if (store.error()) {
+  <p class="error">{{ store.error() }}</p>
+}
+
+<!-- Enrollment cards -->
+@for (enrollment of store.entities(); track enrollment.id) {
+  <div class="enrollment-card">
+    <span>Enrollment #{{ enrollment.id }}</span>
+    <span>Student ID: {{ enrollment.studentId }}</span>
+    <span>Enrolled: {{ enrollment.enrolledAt | date:'medium' }}</span>
+    <button (click)="onApprove(enrollment.id)">Approve</button>
+  </div>
+} @empty {
+  <p>No enrollments found for this course.</p>
+}

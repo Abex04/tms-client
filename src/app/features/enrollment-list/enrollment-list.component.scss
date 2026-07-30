@@ -1,0 +1,57 @@
+/* Enrollment List styles */
+.enrollment-card {
+  border: 1px solid #e5e7eb;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+  background: white;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+}
+
+.enrollment-card .status {
+  font-weight: 600;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.875rem;
+}
+
+.enrollment-card .status:contains('Pending') {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.enrollment-card .status:contains('Approved') {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.enrollment-card .status:contains('Rejected') {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.enrollment-card button {
+  background: #3b82f6;
+  color: white;
+  border: none;
+  padding: 0.25rem 0.75rem;
+  border-radius: 0.375rem;
+  cursor: pointer;
+  font-weight: 500;
+  margin-left: auto;
+}
+
+.enrollment-card button:hover {
+  background: #2563eb;
+}
+
+.error {
+  color: #dc2626;
+  background: #fee2e2;
+  padding: 0.75rem;
+  border-radius: 0.375rem;
+  border: 1px solid #fca5a5;
+}
