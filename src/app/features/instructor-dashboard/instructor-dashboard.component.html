@@ -1,0 +1,40 @@
+<!-- ============================================================
+     Instructor Dashboard - Critical UI loads instantly
+     Heavy chart is deferred until user scrolls to it
+     ============================================================ -->
+
+<!-- Critical UI: Header with pending count -->
+<div class="dashboard-header bg-white rounded-lg shadow-sm p-6 mb-6">
+  <h1 class="text-2xl font-bold text-gray-800">📋 Instructor Command Center</h1>
+  <p class="text-lg text-gray-600 mt-2">
+    Pending Approvals:
+    <span class="font-bold text-blue-600">{{ store.pendingCount() }}</span>
+  </p>
+  <p class="text-sm text-gray-500">Total Enrollments: {{ store.entities().length }}</p>
+</div>
+
+<!-- Deferred Heavy Component: Analytics Chart -->
+<!-- on viewport: triggers when the element scrolls into view -->
+<!-- prefetch on idle: starts downloading during browser idle time -->
+<div class="chart-section mt-8">
+  @defer (on viewport; prefetch on idle) {
+    <!-- When loaded, render the chart with enrollment data -->
+    <app-analytics-chart [data]="store.entities()" />
+  } @placeholder {
+    <!-- Renders instantly on page load - what the user sees initially -->
+    <div class="skeleton-chart bg-gray-100 border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
+      <p class="text-gray-500">📊 Scroll down to view analytics</p>
+    </div>
+  } @loading (minimum 500ms) {
+    <!-- Shows while the chunk is downloading -->
+    <div class="loading-spinner bg-gray-50 border-2 border-gray-200 rounded-lg p-12 text-center">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-4 border-blue-500 border-t-transparent"></div>
+      <p class="text-gray-600 mt-2">Downloading chart engine...</p>
+    </div>
+  } @error {
+    <!-- Shows if the chunk fails to load -->
+    <div class="error-state bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+      <p class="text-red-600">❌ Failed to load chart. Check your connection.</p>
+    </div>
+  }
+</div>

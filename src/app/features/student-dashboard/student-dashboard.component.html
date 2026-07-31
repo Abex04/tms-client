@@ -1,4 +1,4 @@
-<div class="dashboard">
+<div class="dashboard bg-blue-100 p-4 rounded-lg">
   <!-- Student information -->
   <div class="student-info">
     <h1>Welcome, {{ studentName() }}</h1>
@@ -32,10 +32,6 @@
   <!-- Success state: courses loaded successfully -->
   @else {
     <div class="grid">
-      <!-- The ! after value() is TypeScript's non-null assertion operator -->
-      <!-- It tells TypeScript: "I know this value is not null at this point" -->
-      <!-- We can safely use it here because the @else block only runs after -->
-      <!-- isLoading() and error() are both false, meaning data has loaded -->
       @for (course of coursesResource.value()!; track course.id) {
         <tms-course-card
           [course]="course"

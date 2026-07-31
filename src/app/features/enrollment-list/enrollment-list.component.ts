@@ -1,27 +1,66 @@
-import { Component, inject, OnInit, signal } from '@angular/core';
+// Import required Angular core functions
+import { Component, inject, viewChild, effect } from '@angular/core';
+
+// Import DatePipe for formatting dates
 import { DatePipe } from '@angular/common';
 
+// Import Material Table, Paginator, and Sort modules
+import { MatTableModule, MatTableDataSource } from '@angular/material/table';
+import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
+import { MatSortModule, MatSort } from '@angular/material/sort';
+
+// Import the EnrollmentStore
 import { EnrollmentStore } from '../../store/enrollment.store';
+
+// Import the Enrollment model
+import { Enrollment } from '../../models/enrollment.model';
 
 @Component({
   selector: 'app-enrollment-list',
-  imports: [DatePipe],
+  // Import the Material modules AND DatePipe
+  imports: [MatTableModule, MatPaginatorModule, MatSortModule, DatePipe],
   templateUrl: './enrollment-list.component.html',
   styleUrl: './enrollment-list.component.scss',
 })
-export class EnrollmentListComponent implements OnInit {
+export class EnrollmentListComponent {
+  // Inject the EnrollmentStore
   store = inject(EnrollmentStore);
 
-  courseId = signal(1);
+  // Define the columns to display in the table
+  displayedColumns: string[] = ['id', 'studentId', 'courseId', 'enrolledAt', 'actions'];
 
-  ngOnInit() {
-    this.store.loadEnrollments(this.courseId());
+  // Create a Material DataSource
+  dataSource = new MatTableDataSource<Enrollment>();
+
+  // Use viewChild() to get the paginator and sort components
+  readonly paginator = viewChild(MatPaginator);
+  readonly sort = viewChild(MatSort);
+
+  constructor() {
+    // 🟢 FIX ADDED HERE: Pass the currentCourseId() or 1 to satisfy the store requirement
+    this.store.loadEnrollments(this.store.currentCourseId() || 1);
+
+    // Effect 1: Sync store entities with the data source
+    effect(() => {
+      this.dataSource.data = this.store.entities();
+    });
+
+    // Effect 2: Connect paginator and sort after they are available
+    effect(() => {
+      const paginator = this.paginator();
+      const sort = this.sort();
+      if (paginator && sort) {
+        this.dataSource.paginator = paginator;
+        this.dataSource.sort = sort;
+      }
+    });
   }
 
+  // Handle approve button click
   onApprove(id: number) {
     this.store.approveEnrollment({
-      courseId: this.courseId(),
-      enrollmentId: id
+      courseId: this.store.currentCourseId() || 1,
+      enrollmentId: id,
     });
   }
 }

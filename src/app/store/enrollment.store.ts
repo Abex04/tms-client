@@ -39,7 +39,13 @@ export const EnrollmentStore = signalStore(
 
   // withComputed creates read-only derived signals
   withComputed((store) => ({
+    // Total number of enrollments
     enrollmentCount: computed(() => store.entities().length),
+
+    // Count of pending enrollments (filter by status)
+    // For now, since the API doesn't return status, we count all as pending
+    // When the API adds status field, we can filter: e => e.status === 'Pending'
+    pendingCount: computed(() => store.entities().length),
   })),
 
   // withMethods defines functions that can update the store state
