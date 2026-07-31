@@ -1,21 +1,12 @@
-// Import Component, input from Angular core
-import { Component, input } from '@angular/core';
-
-// Import the Enrollment model
+import { Component, Input } from '@angular/core';
 import { Enrollment } from '../../models/enrollment.model';
 
 @Component({
-  selector: 'app-analytics-chart',
-  imports: [],
-  templateUrl: './analytics-chart.component.html',
-  styleUrl: './analytics-chart.component.scss',
+  selector: 'tms-analytics-chart',
+  standalone: true,
+  template: `<div class="p-4 border rounded shadow-sm bg-white">Analytics Chart Component Loaded with {{ data?.length || 0 }} records</div>`,
+  styles: []
 })
 export class AnalyticsChartComponent {
-  // Input for the chart data
-  data = input<Enrollment[]>([]);
-
-  // Simple computed to show count
-  get enrollmentCount() {
-    return this.data().length;
-  }
+  @Input() data: Enrollment[] | null = null;
 }

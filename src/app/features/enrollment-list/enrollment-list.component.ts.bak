@@ -1,48 +1,62 @@
+// Import required Angular core functions
 import { Component, inject, viewChild, effect } from '@angular/core';
+
+// Import DatePipe for formatting dates
+import { DatePipe } from '@angular/common';
+
+// Import Material Table, Paginator, and Sort modules
 import { MatTableModule, MatTableDataSource } from '@angular/material/table';
 import { MatPaginatorModule, MatPaginator } from '@angular/material/paginator';
 import { MatSortModule, MatSort } from '@angular/material/sort';
+
+// Import the EnrollmentStore
 import { EnrollmentStore } from '../../store/enrollment.store';
+
+// Import the Enrollment model
 import { Enrollment } from '../../models/enrollment.model';
 
 @Component({
   selector: 'app-enrollment-list',
-  imports: [MatTableModule, MatPaginatorModule, MatSortModule],
+  // Import the Material modules AND DatePipe
+  imports: [MatTableModule, MatPaginatorModule, MatSortModule, DatePipe],
   templateUrl: './enrollment-list.component.html',
   styleUrl: './enrollment-list.component.scss',
 })
 export class EnrollmentListComponent {
+  // Inject the EnrollmentStore
   store = inject(EnrollmentStore);
-  displayedColumns: string[] = ['studentName', 'courseName', 'status', 'actions'];
+
+  // Define the columns to display in the table
+  displayedColumns: string[] = ['id', 'studentId', 'courseId', 'enrolledAt', 'actions'];
+
+  // Create a Material DataSource
   dataSource = new MatTableDataSource<Enrollment>();
 
+  // Use viewChild() to get the paginator and sort components
   readonly paginator = viewChild(MatPaginator);
   readonly sort = viewChild(MatSort);
 
   constructor() {
-    // Effect 1: Map store entities to the expected column names
+    // 🟢 FIX ADDED HERE: Pass the currentCourseId() or 1 to satisfy the store requirement
+    this.store.loadEnrollments(this.store.currentCourseId() || 1);
+
+    // Effect 1: Sync store entities with the data source
     effect(() => {
-      const data = this.store.entities().map(enrollment => ({
-        ...enrollment,
-        studentName: enrollment.studentId,
-        courseName: enrollment.courseId
-      }));
-      this.dataSource.data = data;
+      this.dataSource.data = this.store.entities().map(enrollment => ({ ...enrollment, studentName: enrollment.studentId, courseName: enrollment.courseId }));
     });
 
-    // Effect 2: Connect paginator and sort, and fix the '0 of 0' glitch
+    // Effect 2: Connect paginator and sort after they are available
     effect(() => {
       const paginator = this.paginator();
       const sort = this.sort();
       if (paginator && sort) {
         this.dataSource.paginator = paginator;
         this.dataSource.sort = sort;
-        // Force a refresh so the paginator recalculates the total length
-        this.dataSource.data = [...this.dataSource.data];
       }
     });
   }
 
+  // Handle approve button click
   onApprove(id: number) {
     this.store.approveEnrollment({
       courseId: this.store.currentCourseId() || 1,
