@@ -1,0 +1,43 @@
+<div class="max-w-6xl mx-auto p-6 bg-slate-50 min-h-screen">
+  
+  <!-- Header Section -->
+  <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-200">
+    <div class="flex justify-between items-center flex-wrap gap-4">
+      <div>
+        <h1 class="text-3xl font-bold text-slate-800">Instructor Command Center</h1>
+        <p class="text-slate-500 text-sm mt-1">Manage enrollments and view analytics</p>
+      </div>
+      <div class="bg-blue-50 px-4 py-2 rounded-lg border border-blue-100">
+        <span class="text-sm font-medium text-blue-700">Pending Approvals</span>
+        <p class="text-2xl font-bold text-blue-600 text-center">{{ store.pendingCount() }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Chart Section with @defer -->
+  <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-200 chart-section">
+    <h2 class="text-lg font-semibold text-slate-700 mb-4">Enrollment Analytics</h2>
+    @defer (on viewport; prefetch on timer(500)) {
+      <app-analytics-chart [data]="store.entities()"></app-analytics-chart>
+    } @placeholder {
+      <div class="skeleton-chart h-40 flex items-center justify-center text-slate-400 border-2 border-dashed border-slate-300 rounded-lg">
+        Scroll down to view analytics...
+      </div>
+    } @loading (minimum 500ms) {
+      <div class="spinner flex items-center justify-center h-40 text-blue-600">
+        Downloading chart engine...
+      </div>
+    } @error {
+      <p class="text-red-500 p-4 bg-red-50 rounded-lg">Failed to load chart. Check your connection.</p>
+    }
+  </div>
+
+  <!-- Table Section -->
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="p-4 border-b border-slate-200 bg-slate-50">
+      <h2 class="text-lg font-semibold text-slate-700">Active Enrollments</h2>
+    </div>
+    <app-enrollment-list></app-enrollment-list>
+  </div>
+
+</div>

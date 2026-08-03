@@ -1,0 +1,74 @@
+/* Modern Table Styling */
+.custom-table {
+  width: 100%;
+  background: white;
+  border-collapse: collapse;
+}
+
+th.mat-header-cell {
+  background-color: #f8fafc;
+  color: #475569;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 16px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+td.mat-cell {
+  padding: 16px;
+  color: #1e293b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+/* Hover effect for rows */
+tr.mat-row:hover {
+  background-color: #f1f5f9;
+  transition: background-color 0.2s ease;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+}
+
+.status-badge.pending {
+  background-color: #fef9c3; /* Yellow */
+  color: #854d0e;
+}
+
+.status-badge.approved {
+  background-color: #dcfce7; /* Green */
+  color: #166534;
+}
+
+/* Approve Button */
+.approve-btn {
+  background-color: #2563eb; /* Blue */
+  color: white;
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.approve-btn:hover {
+  background-color: #1d4ed8; /* Darker Blue */
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px -1px rgba(37, 99, 235, 0.3);
+}
+
+/* Paginator Styling */
+mat-paginator {
+  background-color: #f8fafc;
+  border-top: 1px solid #e2e8f0;
+  padding: 8px 0;
+}
