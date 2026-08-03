@@ -4,22 +4,17 @@ import { Observable } from 'rxjs';
 import { Enrollment } from '../models/enrollment.model';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class EnrollmentService {
   private http = inject(HttpClient);
-  // Use the full API URL with the correct port
-  private baseUrl = 'http://localhost:5189/api';
+  private baseUrl = '/api/courses';
 
   getByCourse(courseId: number): Observable<Enrollment[]> {
-    return this.http.get<Enrollment[]>(`${this.baseUrl}/courses/${courseId}/enrollments`);
+    return this.http.get<Enrollment[]>(`${this.baseUrl}/${courseId}/enrollments`);
   }
 
   approve(courseId: number, enrollmentId: number): Observable<void> {
-    console.log(`Approving enrollment ${enrollmentId} for course ${courseId}`);
-    return new Observable((observer) => {
-      observer.next();
-      observer.complete();
-    });
+    return this.http.post<void>(`${this.baseUrl}/${courseId}/enrollments/${enrollmentId}/approve`, {});
   }
 }
