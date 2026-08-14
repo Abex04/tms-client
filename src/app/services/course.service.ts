@@ -3,12 +3,15 @@
 // - HttpClient: for making HTTP requests to the .NET API
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-
 // Import RxJS operators for transforming the response
 import { map } from 'rxjs/operators';
-
 // Import our TypeScript interfaces that match the API contracts
 import { Course, CourseDetail, PagedResponse } from '../models/course.model';
+// M10 Session 1: environment config replaces the old hardcoded absolute
+// URL. Development uses the dev-server proxy (relative path, no port);
+// production points at whatever host serves the API in that environment -
+// swapping environments is now a config change, not a code change.
+import { environment } from '../../environments/environment';
 
 // @Injectable() tells Angular: "This class can be injected into other classes"
 // providedIn: 'root' means Angular creates one singleton instance and shares it across the entire app
@@ -21,10 +24,11 @@ export class CourseService {
   // This is how we make HTTP calls to our .NET API
   private http = inject(HttpClient);
 
-  // Base URL for the TMS API
-  // Using V1 endpoint because it returns items[] array that matches our PagedResponse interface
-  // The API is running on port 5189 (from the dotnet run output)
-  private baseUrl = 'http://localhost:5189/api/v1/courses';
+  // Base URL for the TMS API — built from environment.apiUrl rather than
+  // a hardcoded 'http://localhost:5189/...'. Relative URLs like this flow
+  // through the Angular dev-server proxy (proxy.conf.json) in development,
+  // and through whatever reverse proxy fronts the app in production.
+  private baseUrl = `${environment.apiUrl}/courses`;
 
   /**
    * Get all courses with pagination
