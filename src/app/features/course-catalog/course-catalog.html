@@ -1,0 +1,29 @@
+<div class="max-w-3xl mx-auto p-6">
+  <h2 class="text-lg font-semibold text-slate-700 mb-4">Course Catalog (M10 Session 3 — Optimistic Delete Test)</h2>
+
+  @if (store.error()) {
+    <div class="mb-4 p-3 rounded-lg bg-red-50 text-red-700 text-sm font-medium border border-red-200">
+      {{ store.error() }}
+    </div>
+  }
+
+  @if (store.isLoading()) {
+    <p class="text-slate-400 text-sm">Loading courses...</p>
+  }
+
+  <div class="space-y-3">
+    @for (course of store.entities(); track course.id) {
+      <div class="flex justify-between items-center p-4 bg-white rounded-lg border border-slate-200 shadow-sm">
+        <div>
+          <p class="font-semibold text-slate-800">{{ course.title }}</p>
+          <p class="text-sm text-slate-500">{{ course.code }} — {{ course.enrollmentCount }} / {{ course.maxCapacity }} enrolled</p>
+        </div>
+        <button
+          (click)="onDelete(course.id)"
+          class="bg-red-600 hover:bg-red-700 text-white text-sm font-medium px-4 py-2 rounded-md transition-colors">
+          Delete Course
+        </button>
+      </div>
+    }
+  </div>
+</div>
