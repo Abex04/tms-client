@@ -3,6 +3,10 @@ import { InstructorDashboardComponent } from './features/instructor-dashboard/in
 import { EnrollmentListComponent } from './features/enrollment-list/enrollment-list.component';
 import { GradeSubmission } from './features/grade-submission/grade-submission';
 import { CourseCatalog } from './features/course-catalog/course-catalog';
+import { AdminCourseList } from './features/admin-course-list/admin-course-list';
+import { Unauthorized } from './features/unauthorized/unauthorized';
+import { roleGuard } from './guards/role.guard';
+import { Login } from './features/login/login';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
@@ -10,4 +14,7 @@ export const routes: Routes = [
   { path: 'list', component: EnrollmentListComponent }
   , { path: 'grade-submission', component: GradeSubmission }
   , { path: 'courses', component: CourseCatalog }
+  , { path: 'admin/courses', component: AdminCourseList, canActivate: [roleGuard('Admin')] }
+  , { path: 'unauthorized', component: Unauthorized }
+  , { path: 'login', component: Login }
 ];

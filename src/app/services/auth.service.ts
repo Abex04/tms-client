@@ -3,13 +3,19 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 
 export interface TmsUser {
+  email: string;
   displayName: string;
   role: string;
 }
 
 export interface LoginCredentials {
-  username: string;
+  email: string;
   password: string;
+}
+
+export interface AuthResponse {
+  accessToken: string;
+  refreshToken: string;
 }
 
 @Injectable({
@@ -18,28 +24,42 @@ export interface LoginCredentials {
 export class AuthService {
   private http = inject(HttpClient);
 
-  // Session state lives here as a signal, not a raw token - the token
-  // itself never touches JavaScript at all, since it's in an HttpOnly
-  // cookie the browser manages automatically.
+  // M11 Session 3: the JWT access token now lives here, in memory only -
+  // never in localStorage, so an XSS payload reading localStorage can't
+  // steal it. It's lost on page refresh by design (short 15-min expiry
+  // means the app should re-login or use the refresh token, not persist
+  // this long-term).
+  private accessToken = signal<string | null>(null);
   currentUser = signal<TmsUser | null>(null);
+
+  getAccessToken(): string | null {
+    return this.accessToken();
+  }
 
   hasRole(role: string): boolean {
     const user = this.currentUser();
     return user?.role === role || user?.role === 'Admin';
   }
 
-  async login(credentials: LoginCredentials) {
-    // Server sets the HttpOnly auth cookie via the Set-Cookie response
-    // header - we never read or store the token ourselves.
-    await firstValueFrom(
-      this.http.post<void>('/api/v2/auth/login', credentials)
+  async login(credentials: LoginCredentials): Promise<void> {
+    const res = await firstValueFrom(
+      this.http.post<AuthResponse>('/api/v2/auth/login', credentials)
     );
+    this.accessToken.set(res.accessToken);
 
-    // Browser automatically attaches the cookie on this next request -
-    // no token to manually pass along.
-    const user = await firstValueFrom(
-      this.http.get<TmsUser>('/api/v2/auth/me')
-    );
-    this.currentUser.set(user);
+    // Decode the JWT payload directly - our TokenService uses literal
+    // short claim names (sub, email, role, FirstName), not the long
+    // schema URIs .NET uses by default, so no fallback chain needed here.
+    const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
+    this.currentUser.set({
+      email: payload.email,
+      displayName: payload.FirstName || payload.email || 'User',
+      role: payload.role || 'Student',
+    });
+  }
+
+  logout(): void {
+    this.accessToken.set(null);
+    this.currentUser.set(null);
   }
 }
