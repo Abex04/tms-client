@@ -18,17 +18,24 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+// localStorage key for the refresh token. Note: the refresh token was
+// already delivered to the browser as plain JSON on login - storing it
+// in memory only never actually hid it from an XSS payload running
+// during that session. Persisting it here just means it survives a
+// page refresh too, which is what lets tryRestoreSession() silently
+// re-authenticate instead of forcing a full re-login every refresh.
+const REFRESH_TOKEN_KEY = 'tms_refresh_token';
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private http = inject(HttpClient);
 
-  // M11 Session 3: the JWT access token now lives here, in memory only -
-  // never in localStorage, so an XSS payload reading localStorage can't
-  // steal it. It's lost on page refresh by design (short 15-min expiry
-  // means the app should re-login or use the refresh token, not persist
-  // this long-term).
+  // The short-lived (15 min) access token stays in memory only - never
+  // persisted. This is what an XSS payload would need to steal to
+  // impersonate an active session, and it's gone the moment the tab
+  // closes or refreshes, unlike the refresh token.
   private accessToken = signal<string | null>(null);
   currentUser = signal<TmsUser | null>(null);
 
@@ -41,15 +48,10 @@ export class AuthService {
     return user?.role === role || user?.role === 'Admin';
   }
 
-  async login(credentials: LoginCredentials): Promise<void> {
-    const res = await firstValueFrom(
-      this.http.post<AuthResponse>('/api/v2/auth/login', credentials)
-    );
+  private setSessionFromResponse(res: AuthResponse): void {
     this.accessToken.set(res.accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken);
 
-    // Decode the JWT payload directly - our TokenService uses literal
-    // short claim names (sub, email, role, FirstName), not the long
-    // schema URIs .NET uses by default, so no fallback chain needed here.
     const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
     this.currentUser.set({
       email: payload.email,
@@ -58,8 +60,40 @@ export class AuthService {
     });
   }
 
+  async login(credentials: LoginCredentials): Promise<void> {
+    const res = await firstValueFrom(
+      this.http.post<AuthResponse>('/api/v2/auth/login', credentials)
+    );
+    this.setSessionFromResponse(res);
+  }
+
+  // Called once at app startup (see app.config.ts's provideAppInitializer).
+  // If a refresh token survived from a previous session, silently trade
+  // it for a new access token instead of forcing the user back to
+  // /login on every page refresh. Fails silently - an expired/invalid
+  // refresh token just means the user stays logged out, same as if
+  // they'd never had a session.
+  async tryRestoreSession(): Promise<void> {
+    const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (!storedRefreshToken) return;
+
+    try {
+      const res = await firstValueFrom(
+        this.http.post<AuthResponse>('/api/v2/auth/refresh', {
+          refreshToken: storedRefreshToken,
+        })
+      );
+      this.setSessionFromResponse(res);
+    } catch {
+      // Refresh token expired, revoked, or already used - clear it so
+      // we don't keep retrying a dead token on every future load.
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+    }
+  }
+
   logout(): void {
     this.accessToken.set(null);
     this.currentUser.set(null);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
   }
 }
