@@ -18,17 +18,14 @@ export interface AuthResponse {
   refreshToken: string;
 }
 
+const REFRESH_TOKEN_KEY = 'tms_refresh_token';
+
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
   private http = inject(HttpClient);
 
-  // M11 Session 3: the JWT access token now lives here, in memory only -
-  // never in localStorage, so an XSS payload reading localStorage can't
-  // steal it. It's lost on page refresh by design (short 15-min expiry
-  // means the app should re-login or use the refresh token, not persist
-  // this long-term).
   private accessToken = signal<string | null>(null);
   currentUser = signal<TmsUser | null>(null);
 
@@ -41,15 +38,10 @@ export class AuthService {
     return user?.role === role || user?.role === 'Admin';
   }
 
-  async login(credentials: LoginCredentials): Promise<void> {
-    const res = await firstValueFrom(
-      this.http.post<AuthResponse>('/api/v2/auth/login', credentials)
-    );
+  private setSessionFromResponse(res: AuthResponse): void {
     this.accessToken.set(res.accessToken);
+    localStorage.setItem(REFRESH_TOKEN_KEY, res.refreshToken);
 
-    // Decode the JWT payload directly - our TokenService uses literal
-    // short claim names (sub, email, role, FirstName), not the long
-    // schema URIs .NET uses by default, so no fallback chain needed here.
     const payload = JSON.parse(atob(res.accessToken.split('.')[1]));
     this.currentUser.set({
       email: payload.email,
@@ -58,8 +50,46 @@ export class AuthService {
     });
   }
 
+  async login(credentials: LoginCredentials): Promise<void> {
+    const res = await firstValueFrom(
+      this.http.post<AuthResponse>('/api/v2/auth/login', credentials)
+    );
+    this.setSessionFromResponse(res);
+  }
+
+  // Called once at app startup - silently restores a session from a
+  // persisted refresh token instead of forcing /login on every page refresh.
+  async tryRestoreSession(): Promise<void> {
+    const storedRefreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (!storedRefreshToken) return;
+    await this.refreshAccessToken(storedRefreshToken);
+  }
+
+  // Shared refresh logic - used by tryRestoreSession() at startup and by
+  // SessionKeepaliveService while the user is actively using the app.
+  // Rotation means each call both extends AND replaces the stored
+  // refresh token - reusing an old one after this would trigger the
+  // backend's theft-detection and revoke every session for this user.
+  async refreshAccessToken(tokenOverride?: string): Promise<void> {
+    const tokenToUse = tokenOverride ?? localStorage.getItem(REFRESH_TOKEN_KEY);
+    if (!tokenToUse) throw new Error('No refresh token available.');
+
+    try {
+      const res = await firstValueFrom(
+        this.http.post<AuthResponse>('/api/v2/auth/refresh', {
+          refreshToken: tokenToUse,
+        })
+      );
+      this.setSessionFromResponse(res);
+    } catch (err) {
+      localStorage.removeItem(REFRESH_TOKEN_KEY);
+      throw err;
+    }
+  }
+
   logout(): void {
     this.accessToken.set(null);
     this.currentUser.set(null);
+    localStorage.removeItem(REFRESH_TOKEN_KEY);
   }
 }

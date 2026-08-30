@@ -1,4 +1,4 @@
-import { ApplicationConfig, provideZoneChangeDetection } from '@angular/core';
+import { ApplicationConfig, inject, provideZoneChangeDetection, provideAppInitializer } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { provideHttpClient, withInterceptors, withXsrfConfiguration } from '@angular/common/http';
@@ -6,18 +6,14 @@ import { routes } from './app.routes';
 import { credentialsInterceptor } from './interceptors/credentials.interceptor';
 import { errorInterceptor } from './interceptors/error.interceptor';
 import { jwtInterceptor } from './interceptors/jwt.interceptor';
+import { AuthService } from './services/auth.service';
+import { SessionKeepaliveService } from './services/session-keepalive.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideAnimations(),
-    // M10 Session 2: credentialsInterceptor forces withCredentials: true
-    // on every request, so the browser attaches the tms_auth HttpOnly
-    // cookie automatically. withXsrfConfiguration tells Angular which
-    // cookie to read (XSRF-TOKEN, set by our Antiforgery middleware) and
-    // which header to echo it back as (X-XSRF-TOKEN) on mutating requests -
-    // this must match the HeaderName configured in Program.cs exactly.
     provideHttpClient(
       withInterceptors([credentialsInterceptor, errorInterceptor, jwtInterceptor]),
       withXsrfConfiguration({
@@ -25,5 +21,14 @@ export const appConfig: ApplicationConfig = {
         headerName: 'X-XSRF-TOKEN',
       })
     ),
+    // M12: silently restore a session from a persisted refresh token
+    // before the app's first render, then start the keepalive timer so
+    // an active session (mouse/keyboard activity within the last 15 min)
+    // stays alive indefinitely, while a genuinely idle session expires.
+    provideAppInitializer(() => {
+      const auth = inject(AuthService);
+      const keepalive = inject(SessionKeepaliveService);
+      return auth.tryRestoreSession().then(() => keepalive.start());
+    }),
   ],
 };
