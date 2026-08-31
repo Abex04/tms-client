@@ -22,6 +22,12 @@ export const EnrollmentStore = signalStore(
     // Mock data for now — this store isn't wired to a real GET endpoint yet
     // (a separate change outside this session's scope). What matters here
     // is that approveEnrollment below now makes a REAL backend call.
+    // M12 Session 2: lets tests set up known entity state directly,
+    // without going through loadEnrollments()'s hardcoded mock data.
+    seed: (rows: Enrollment[]) => {
+      patchState(store, setAllEntities(rows));
+    },
+
     loadEnrollments: () => {
       const mockData: Enrollment[] = [
         { id: 1, studentId: 1, studentName: 'Alice Smith', courseId: 1, courseName: 'CS-101', status: 'Pending', enrolledAt: new Date().toISOString() },
