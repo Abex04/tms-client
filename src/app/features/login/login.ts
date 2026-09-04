@@ -21,10 +21,12 @@ export class Login {
   });
 
   errorMessage = signal('');
+  isLoading = signal(false);
 
   async onSubmit() {
-    if (this.form.invalid) return;
+    if (this.form.invalid || this.isLoading()) return;
     this.errorMessage.set('');
+    this.isLoading.set(true);
 
     try {
       const { email, password } = this.form.getRawValue();
@@ -32,6 +34,8 @@ export class Login {
       this.router.navigate(['/dashboard']);
     } catch (err: any) {
       this.errorMessage.set(err.error?.detail ?? 'Login failed.');
+    } finally {
+      this.isLoading.set(false);
     }
   }
 }

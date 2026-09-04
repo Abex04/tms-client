@@ -7,9 +7,10 @@ import { AdminCourseList } from './features/admin-course-list/admin-course-list'
 import { Unauthorized } from './features/unauthorized/unauthorized';
 import { roleGuard } from './guards/role.guard';
 import { Login } from './features/login/login';
+import { Welcome } from './features/welcome/welcome';
 
 export const routes: Routes = [
-  { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
+  { path: '', component: Welcome },
   { path: 'dashboard', component: InstructorDashboardComponent },
   { path: 'list', component: EnrollmentListComponent }
   , { path: 'grade-submission', component: GradeSubmission }
@@ -17,4 +18,5 @@ export const routes: Routes = [
   , { path: 'admin/courses', component: AdminCourseList, canActivate: [roleGuard('Admin')] }
   , { path: 'unauthorized', component: Unauthorized }
   , { path: 'login', component: Login }
+  , { path: 'welcome', component: Welcome }
 ];
