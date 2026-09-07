@@ -80,6 +80,26 @@ export class AuthService {
     );
   }
 
+  // Demo-mode forgot-password: the backend returns the reset token
+  // directly in the response instead of emailing it (no SMTP setup in
+  // this project). Returns the token so the ForgotPassword page can
+  // show it to the user, who then pastes it into the ResetPassword page.
+  async forgotPassword(email: string): Promise<{ message: string; resetToken?: string }> {
+    return firstValueFrom(
+      this.http.post<{ message: string; resetToken?: string }>('/api/v2/auth/forgot-password', { email })
+    );
+  }
+
+  async resetPassword(email: string, token: string, newPassword: string): Promise<void> {
+    await firstValueFrom(
+      this.http.post('/api/v2/auth/reset-password', {
+        email,
+        token,
+        newPassword,
+      })
+    );
+  }
+
   // Called once at app startup - silently restores a session from a
   // persisted refresh token instead of forcing /login on every page refresh.
   async tryRestoreSession(): Promise<void> {

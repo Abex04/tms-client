@@ -9,6 +9,8 @@ import { roleGuard } from './guards/role.guard';
 import { Login } from './features/login/login';
 import { Welcome } from './features/welcome/welcome';
 import { SignUp } from './features/signup/signup';
+import { ForgotPassword } from './features/forgot-password/forgot-password';
+import { ResetPassword } from './features/reset-password/reset-password';
 
 export const routes: Routes = [
   { path: '', component: Welcome },
@@ -21,4 +23,6 @@ export const routes: Routes = [
   , { path: 'login', component: Login }
   , { path: 'welcome', component: Welcome }
   , { path: 'signup', component: SignUp }
+  , { path: 'forgot-password', component: ForgotPassword }
+  , { path: 'reset-password', component: ResetPassword }
 ];

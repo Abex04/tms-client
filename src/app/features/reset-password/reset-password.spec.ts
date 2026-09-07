@@ -2,19 +2,19 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { provideHttpClient } from '@angular/common/http';
 import { provideHttpClientTesting } from '@angular/common/http/testing';
-import { SignUp } from './signup';
+import { ResetPassword } from './reset-password';
 
-describe('SignUp', () => {
-  let component: SignUp;
-  let fixture: ComponentFixture<SignUp>;
+describe('ResetPassword', () => {
+  let component: ResetPassword;
+  let fixture: ComponentFixture<ResetPassword>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [SignUp],
+      imports: [ResetPassword],
       providers: [provideRouter([]), provideHttpClient(), provideHttpClientTesting()],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(SignUp);
+    fixture = TestBed.createComponent(ResetPassword);
     component = fixture.componentInstance;
     await fixture.whenStable();
   });
@@ -27,13 +27,13 @@ describe('SignUp', () => {
     expect(component.form.invalid).toBe(true);
   });
 
-  it('should be valid when all fields are correctly filled', () => {
-    component.form.setValue({
-      firstName: 'Jane',
-      lastName: 'Doe',
-      email: 'jane@example.com',
-      password: 'SecurePass123!',
-    });
+  it('should be invalid with a weak password', () => {
+    component.form.setValue({ email: 'jane@example.com', token: 'sometoken', newPassword: 'weak' });
+    expect(component.form.valid).toBe(false);
+  });
+
+  it('should be valid with a strong password', () => {
+    component.form.setValue({ email: 'jane@example.com', token: 'sometoken', newPassword: 'SecurePass123!' });
     expect(component.form.valid).toBe(true);
   });
 });
