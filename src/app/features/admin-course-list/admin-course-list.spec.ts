@@ -20,3 +20,4 @@ describe('AdminCourseList', () => {
     expect(component).toBeTruthy();
   });
 });
+

@@ -8,6 +8,7 @@ import { Unauthorized } from './features/unauthorized/unauthorized';
 import { roleGuard } from './guards/role.guard';
 import { Login } from './features/login/login';
 import { Welcome } from './features/welcome/welcome';
+import { SignUp } from './features/signup/signup';
 
 export const routes: Routes = [
   { path: '', component: Welcome },
@@ -19,4 +20,5 @@ export const routes: Routes = [
   , { path: 'unauthorized', component: Unauthorized }
   , { path: 'login', component: Login }
   , { path: 'welcome', component: Welcome }
+  , { path: 'signup', component: SignUp }
 ];

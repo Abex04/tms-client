@@ -13,6 +13,13 @@ export interface LoginCredentials {
   password: string;
 }
 
+export interface RegisterDetails {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -55,6 +62,22 @@ export class AuthService {
       this.http.post<AuthResponse>('/api/v2/auth/login', credentials)
     );
     this.setSessionFromResponse(res);
+  }
+
+  // Public self-registration. Role is intentionally hardcoded to 'Student'
+  // on the caller side (see SignUp component) rather than exposed as a
+  // form field, since the backend trusts whatever role string it's sent.
+  // Does not log the user in - they sign in separately afterward.
+  async register(details: RegisterDetails): Promise<void> {
+    await firstValueFrom(
+      this.http.post('/api/v2/auth/register', {
+        email: details.email,
+        password: details.password,
+        firstName: details.firstName,
+        lastName: details.lastName,
+        role: 'Student',
+      })
+    );
   }
 
   // Called once at app startup - silently restores a session from a
