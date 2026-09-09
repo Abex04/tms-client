@@ -1,36 +1,45 @@
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950 px-4">
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-slate-900 via-slate-800 to-blue-950 px-4 py-10">
   <div class="w-full max-w-sm bg-white rounded-2xl shadow-2xl p-8">
 
     <div class="flex flex-col items-center mb-6">
-      <div routerLink="/" class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg mb-3 cursor-pointer hover:bg-blue-700 transition-colors">
+      <div routerLink="/" class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg mb-3 cursor-pointer shadow-md hover:bg-blue-700 hover:shadow-lg transition-all">
         TMS
       </div>
       <h2 class="text-xl font-semibold text-slate-800">Create your account</h2>
       <p class="text-sm text-slate-500 mt-1">Sign up to get started</p>
     </div>
 
-    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4">
+    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-5">
       <div class="grid grid-cols-2 gap-3">
         <div>
-          <label for="firstName" class="block text-sm font-medium text-slate-600 mb-1">First name</label>
+          <label for="firstName" class="block text-sm font-medium text-slate-700 mb-1.5">First name</label>
           <input id="firstName" type="text" formControlName="firstName" placeholder="John"
-            class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder:text-slate-400" />
+            class="w-full border rounded-lg px-3 py-2.5 text-sm shadow-sm transition-all outline-none
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              placeholder:text-slate-400"
+            [class.border-slate-300]="!(form.controls.firstName.touched && form.controls.firstName.invalid)"
+            [class.border-red-400]="form.controls.firstName.touched && form.controls.firstName.invalid" />
           @if (form.controls.firstName.touched && form.controls.firstName.invalid) {
-            <p class="text-red-500 text-xs mt-1">First name is required.</p>
+            <p class="text-red-500 text-xs mt-1.5">First name is required.</p>
           }
         </div>
         <div>
-          <label for="lastName" class="block text-sm font-medium text-slate-600 mb-1">Last name</label>
+          <label for="lastName" class="block text-sm font-medium text-slate-700 mb-1.5">Last name</label>
           <input id="lastName" type="text" formControlName="lastName" placeholder="Doe"
-            class="w-full border border-slate-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder:text-slate-400" />
+            class="w-full border rounded-lg px-3 py-2.5 text-sm shadow-sm transition-all outline-none
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              placeholder:text-slate-400"
+            [class.border-slate-300]="!(form.controls.lastName.touched && form.controls.lastName.invalid)"
+            [class.border-red-400]="form.controls.lastName.touched && form.controls.lastName.invalid" />
           @if (form.controls.lastName.touched && form.controls.lastName.invalid) {
-            <p class="text-red-500 text-xs mt-1">Last name is required.</p>
+            <p class="text-red-500 text-xs mt-1.5">Last name is required.</p>
           }
         </div>
       </div>
 
+      <!-- Email -->
       <div>
-        <label for="email" class="block text-sm font-medium text-slate-600 mb-1">Email</label>
+        <label for="email" class="block text-sm font-medium text-slate-700 mb-1.5">Email</label>
         <div class="relative">
           <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
@@ -38,42 +47,151 @@
             </svg>
           </span>
           <input id="email" type="email" formControlName="email" placeholder="you@example.com"
-            class="w-full border border-slate-300 rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder:text-slate-400" />
+            class="w-full border rounded-lg pl-9 pr-9 py-2.5 text-sm shadow-sm transition-all outline-none
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              placeholder:text-slate-400"
+            [class.border-slate-300]="!form.controls.email.touched || form.controls.email.valid"
+            [class.border-red-400]="form.controls.email.touched && form.controls.email.invalid" />
+          @if (form.controls.email.touched && form.controls.email.valid) {
+            <span class="absolute inset-y-0 right-0 flex items-center pr-3 text-green-500">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+            </span>
+          }
         </div>
         @if (form.controls.email.touched && form.controls.email.invalid) {
-          <p class="text-red-500 text-xs mt-1">
+          <p class="text-red-500 text-xs mt-1.5">
             {{ form.controls.email.errors?.['required'] ? 'Email is required.' : 'Enter a valid email address.' }}
           </p>
         }
       </div>
 
+      <!-- Password -->
       <div>
-        <label for="password" class="block text-sm font-medium text-slate-600 mb-1">Password</label>
+        <label for="password" class="block text-sm font-medium text-slate-700 mb-1.5">Password</label>
         <div class="relative">
           <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
             </svg>
           </span>
-          <input id="password" type="password" formControlName="password" placeholder="12+ chars, 1 uppercase, 1 number, 1 symbol"
-            class="w-full border border-slate-300 rounded-md pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition placeholder:text-slate-400" />
+          <input [type]="showPassword() ? 'text' : 'password'" id="password" formControlName="password"
+            placeholder="12+ chars, 1 uppercase, 1 number, 1 symbol"
+            class="w-full border rounded-lg pl-9 pr-10 py-2.5 text-sm shadow-sm transition-all outline-none
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              placeholder:text-slate-400"
+            [class.border-slate-300]="!(form.controls.password.touched && form.controls.password.invalid)"
+            [class.border-red-400]="form.controls.password.touched && form.controls.password.invalid" />
+          <button type="button" (click)="togglePasswordVisibility()"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors"
+            [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+            @if (showPassword()) {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+              </svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            }
+          </button>
         </div>
+
+        @if (passwordStrength() !== 'empty') {
+          <div class="mt-2">
+            <div class="flex gap-1.5 h-1.5">
+              <div class="flex-1 rounded-full transition-colors"
+                [class.bg-red-400]="passwordStrength() === 'weak'"
+                [class.bg-amber-400]="passwordStrength() === 'medium'"
+                [class.bg-green-500]="passwordStrength() === 'strong'"></div>
+              <div class="flex-1 rounded-full transition-colors"
+                [class.bg-slate-200]="passwordStrength() === 'weak'"
+                [class.bg-amber-400]="passwordStrength() === 'medium'"
+                [class.bg-green-500]="passwordStrength() === 'strong'"></div>
+              <div class="flex-1 rounded-full transition-colors"
+                [class.bg-slate-200]="passwordStrength() !== 'strong'"
+                [class.bg-green-500]="passwordStrength() === 'strong'"></div>
+            </div>
+            <p class="text-xs mt-1"
+              [class.text-red-500]="passwordStrength() === 'weak'"
+              [class.text-amber-600]="passwordStrength() === 'medium'"
+              [class.text-green-600]="passwordStrength() === 'strong'">
+              @if (passwordStrength() === 'weak') { Weak password }
+              @if (passwordStrength() === 'medium') { Medium strength }
+              @if (passwordStrength() === 'strong') { Strong password }
+            </p>
+          </div>
+        }
+
         @if (form.controls.password.touched && form.controls.password.invalid) {
-          <p class="text-red-500 text-xs mt-1">
+          <p class="text-red-500 text-xs mt-1.5">
             {{ form.controls.password.errors?.['required'] ? 'Password is required.' : 'Must be 12+ characters with an uppercase letter, a number, and a symbol.' }}
           </p>
         }
       </div>
 
+      <!-- Confirm Password -->
+      <div>
+        <label for="confirmPassword" class="block text-sm font-medium text-slate-700 mb-1.5">Confirm password</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+          </span>
+          <input [type]="showConfirmPassword() ? 'text' : 'password'" id="confirmPassword" formControlName="confirmPassword"
+            placeholder="Re-enter your password"
+            class="w-full border rounded-lg pl-9 pr-10 py-2.5 text-sm shadow-sm transition-all outline-none
+              focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+              placeholder:text-slate-400"
+            [class.border-slate-300]="!(form.controls.confirmPassword.touched && (form.controls.confirmPassword.invalid || form.errors?.['passwordsMismatch']))"
+            [class.border-red-400]="form.controls.confirmPassword.touched && (form.controls.confirmPassword.invalid || form.errors?.['passwordsMismatch'])" />
+          <button type="button" (click)="toggleConfirmPasswordVisibility()"
+            class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-slate-600 transition-colors"
+            [attr.aria-label]="showConfirmPassword() ? 'Hide password' : 'Show password'">
+            @if (showConfirmPassword()) {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21" />
+              </svg>
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            }
+          </button>
+        </div>
+        @if (form.controls.confirmPassword.touched && form.errors?.['passwordsMismatch']) {
+          <p class="text-red-500 text-xs mt-1.5">Passwords do not match.</p>
+        }
+      </div>
+
       @if (errorMessage()) {
-        <p class="text-red-500 text-sm bg-red-50 border border-red-200 rounded-md px-3 py-2">{{ errorMessage() }}</p>
+        <p class="text-red-500 text-sm bg-red-50 border border-red-200 rounded-lg px-3 py-2">{{ errorMessage() }}</p>
       }
       @if (successMessage()) {
-        <p class="text-green-600 text-sm bg-green-50 border border-green-200 rounded-md px-3 py-2">{{ successMessage() }}</p>
+        <p class="text-green-600 text-sm bg-green-50 border border-green-200 rounded-lg px-3 py-2">{{ successMessage() }}</p>
       }
 
+      <!-- Terms agreement -->
+      <label class="flex items-start gap-2.5 cursor-pointer select-none">
+        <input type="checkbox" formControlName="agreeToTerms"
+          class="mt-0.5 h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-2 focus:ring-blue-500 focus:ring-offset-0 cursor-pointer" />
+        <span class="text-xs text-slate-600 leading-snug">
+          I agree to the
+          <a href="#" (click)="$event.preventDefault()" class="text-blue-600 hover:underline font-medium">Terms of Service</a>
+          and
+          <a href="#" (click)="$event.preventDefault()" class="text-blue-600 hover:underline font-medium">Privacy Policy</a>
+        </span>
+      </label>
+
       <button type="submit" [disabled]="form.invalid || isLoading()"
-        class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-slate-300 disabled:cursor-not-allowed text-white font-medium py-2 rounded-md transition-colors flex items-center justify-center gap-2">
+        class="w-full text-white font-medium py-2.5 rounded-lg shadow-sm transition-all flex items-center justify-center gap-2
+          bg-blue-600 hover:bg-blue-700 hover:shadow-md active:bg-blue-800 active:scale-[0.99]
+          disabled:bg-slate-300 disabled:shadow-none disabled:active:scale-100 disabled:cursor-not-allowed
+          focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
         @if (isLoading()) {
           <svg class="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -87,7 +205,7 @@
 
       <p class="text-center text-sm text-slate-500 mt-4">
         Already have an account?
-        <a routerLink="/login" class="text-blue-600 hover:underline font-medium">Sign in</a>
+        <a routerLink="/login" class="text-blue-600 hover:underline font-medium transition-colors">Sign in</a>
       </p>
     </form>
   </div>
