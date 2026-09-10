@@ -11,6 +11,7 @@ import { Welcome } from './features/welcome/welcome';
 import { SignUp } from './features/signup/signup';
 import { ForgotPassword } from './features/forgot-password/forgot-password';
 import { ResetPassword } from './features/reset-password/reset-password';
+import { Profile } from './features/profile/profile';
 
 export const routes: Routes = [
   { path: '', component: Welcome },
@@ -25,4 +26,5 @@ export const routes: Routes = [
   , { path: 'signup', component: SignUp }
   , { path: 'forgot-password', component: ForgotPassword }
   , { path: 'reset-password', component: ResetPassword }
+  , { path: 'profile', component: Profile }
 ];

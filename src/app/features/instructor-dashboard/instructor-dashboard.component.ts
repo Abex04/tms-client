@@ -1,5 +1,5 @@
 import { Component, inject, signal } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { EnrollmentStore } from '../../store/enrollment.store';
 import { AuthService } from '../../services/auth.service';
 import { AnalyticsChartComponent } from '../analytics-chart/analytics-chart.component';
@@ -8,7 +8,7 @@ import { EnrollmentListComponent } from '../enrollment-list/enrollment-list.comp
 @Component({
   selector: 'app-instructor-dashboard',
   standalone: true,
-  imports: [AnalyticsChartComponent, EnrollmentListComponent],
+  imports: [AnalyticsChartComponent, EnrollmentListComponent, RouterLink],
   templateUrl: './instructor-dashboard.component.html',
 })
 export class InstructorDashboardComponent {
