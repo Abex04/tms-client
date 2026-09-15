@@ -13,6 +13,7 @@ import { ForgotPassword } from './features/forgot-password/forgot-password';
 import { ResetPassword } from './features/reset-password/reset-password';
 import { Profile } from './features/profile/profile';
 import { StudentDashboardComponent } from './features/student-dashboard/student-dashboard.component';
+import { MySchedule } from './features/my-schedule/my-schedule';
 
 export const routes: Routes = [
   { path: '', component: Welcome },
@@ -29,4 +30,5 @@ export const routes: Routes = [
   , { path: 'reset-password', component: ResetPassword }
   , { path: 'profile', component: Profile }
   , { path: 'student-dashboard', component: StudentDashboardComponent, canActivate: [roleGuard('Student')] }
+  , { path: 'my-schedule', component: MySchedule, canActivate: [roleGuard('Student')] }
 ];

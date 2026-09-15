@@ -3,6 +3,17 @@ import { HttpClient } from '@angular/common/http';
 import { firstValueFrom, Observable } from 'rxjs';
 import { Enrollment } from '../models/enrollment.model';
 
+export interface ScheduleItem {
+  courseCode: string;
+  title: string;
+  schedule: string;
+}
+
+export interface Schedule {
+  studentId: number;
+  courses: ScheduleItem[];
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -27,6 +38,12 @@ export class EnrollmentService {
         studentId,
         courseCode,
       })
+    );
+  }
+
+  async getSchedule(studentId: number): Promise<Schedule> {
+    return firstValueFrom(
+      this.http.get<Schedule>(`/api/v2/enrollments/${studentId}/schedule`)
     );
   }
 }
