@@ -31,7 +31,15 @@ export class Login {
     try {
       const { email, password } = this.form.getRawValue();
       await this.auth.login({ email: email!, password: password! });
-      this.router.navigate(['/dashboard']);
+
+      // Route based on role: Students land on their own dashboard,
+      // Instructors/Admins land on the Instructor Command Center.
+      const role = this.auth.currentUser()?.role;
+      if (role === 'Student') {
+        this.router.navigate(['/student-dashboard']);
+      } else {
+        this.router.navigate(['/dashboard']);
+      }
     } catch (err: any) {
       this.errorMessage.set(err.error?.detail ?? 'Login failed.');
     } finally {

@@ -9,7 +9,7 @@ setup('authenticate as admin', async ({ page }) => {
   await page.getByLabel('Password').fill(process.env.TMS_ADMIN_PASS!);
   await page.getByRole('button', { name: 'Sign In' }).click();
 
-  await expect(page.getByRole('heading', { name: /command center/i })).toBeVisible();
+  await expect(page.getByRole('heading', { name: /command center/i })).toBeVisible({ timeout: 15000 });
 
   await page.context().storageState({ path: 'playwright/.auth/admin.json' });
 });

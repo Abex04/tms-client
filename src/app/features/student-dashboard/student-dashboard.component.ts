@@ -1,69 +1,68 @@
-// Import Angular core functions for components, signals, computed values, and dependency injection
-import { Component, signal, computed, inject } from '@angular/core';
-
-// Import rxResource - Angular's bridge between Observables and Signals
-// It handles subscribing (starting the request) and unsubscribing (cleaning up)
-// if the user navigates away before the response arrives - automatically.
-// You never write .subscribe() or .unsubscribe() with rxResource.
+import { Component, inject, signal } from '@angular/core';
 import { rxResource } from '@angular/core/rxjs-interop';
-
-// Import the CourseCard component so we can use it in the template
 import { CourseCardComponent } from '../../ui/course-card/course-card.component';
-
-// Import the Course interface that defines the shape of course data
 import { Course } from '../../models/course.model';
-
-// Import the CourseService to make API calls
 import { CourseService } from '../../services/course.service';
+import { EnrollmentService } from '../../services/enrollment.service';
+import { StudentsService, CurrentStudent } from '../../services/students.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-student-dashboard',
-  // imports array tells Angular: "I use CourseCardComponent in my template"
   imports: [CourseCardComponent],
   templateUrl: './student-dashboard.component.html',
   styleUrl: './student-dashboard.component.scss',
 })
 export class StudentDashboardComponent {
-  // --- Dependency Injection ---
-  // inject(CourseService) requests the service we just created.
-  // Angular finds the singleton instance and gives it to us.
-  // This is similar to constructor injection in .NET
-  private api = inject(CourseService);
+  private courseApi = inject(CourseService);
+  private enrollmentApi = inject(EnrollmentService);
+  private studentsApi = inject(StudentsService);
+  auth = inject(AuthService);
 
-  // --- Student Information (from Exercise 1) ---
-  studentName = signal('Liya Kebede');
-  earnedCredits = signal(45);
+  // The logged-in user's linked Student domain record (id, registration
+  // number, gpa). Loaded once on init - needed because enrollment calls
+  // require the numeric Student.Id, not the Identity account.
+  currentStudent = signal<CurrentStudent | null>(null);
+  studentLoadError = signal('');
 
-  graduationStatus = computed(() =>
-    this.earnedCredits() >= 120 ? 'Eligible for Graduation' : 'In Progress'
-  );
-
-  // --- Exercise 6: Live API Integration ---
-  // rxResource wraps the HTTP call into three managed signals:
-  // - coursesResource.isLoading() -> true while waiting for the server response
-  // - coursesResource.error() -> the error object if the request fails
-  // - coursesResource.value() -> the Course[] array when the request succeeds
-  //
-  // It handles subscribing (starting the request) and unsubscribing (cleaning up
-  // if the user navigates away before the response arrives) automatically.
   coursesResource = rxResource({
-    // stream: a function that returns an Observable
-    // When Angular loads this component, it automatically calls this function
-    // and subscribes to the Observable to start the HTTP request
-    stream: () => this.api.getAll(),
+    stream: () => this.courseApi.getAll(),
   });
 
-  // --- State for selected course (from Exercise 2/3) ---
   selectedCourse = signal<Course | null>(null);
+  enrollError = signal('');
+  enrollSuccess = signal('');
+  isEnrolling = signal(false);
 
-  // Handler for the enroll event from the child component
-  handleEnroll(course: Course) {
-    this.selectedCourse.set(course);
-    console.log('Enrollment requested for:', course.title);
+  constructor() {
+    this.loadCurrentStudent();
   }
 
-  // --- Methods from Exercise 1 ---
-  registerForClass() {
-    this.earnedCredits.update((c) => c + 3);
+  private async loadCurrentStudent() {
+    try {
+      const student = await this.studentsApi.getMe();
+      this.currentStudent.set(student);
+    } catch {
+      this.studentLoadError.set('Could not load your student record.');
+    }
+  }
+
+  async handleEnroll(course: Course) {
+    const student = this.currentStudent();
+    if (!student || this.isEnrolling()) return;
+
+    this.enrollError.set('');
+    this.enrollSuccess.set('');
+    this.isEnrolling.set(true);
+    this.selectedCourse.set(course);
+
+    try {
+      await this.enrollmentApi.enroll(student.id, course.code);
+      this.enrollSuccess.set(`Enrollment request sent for ${course.title}.`);
+    } catch (err: any) {
+      this.enrollError.set(err.error?.detail ?? 'Enrollment failed. Please try again.');
+    } finally {
+      this.isEnrolling.set(false);
+    }
   }
 }

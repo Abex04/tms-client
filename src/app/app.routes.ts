@@ -12,6 +12,7 @@ import { SignUp } from './features/signup/signup';
 import { ForgotPassword } from './features/forgot-password/forgot-password';
 import { ResetPassword } from './features/reset-password/reset-password';
 import { Profile } from './features/profile/profile';
+import { StudentDashboardComponent } from './features/student-dashboard/student-dashboard.component';
 
 export const routes: Routes = [
   { path: '', component: Welcome },
@@ -27,4 +28,5 @@ export const routes: Routes = [
   , { path: 'forgot-password', component: ForgotPassword }
   , { path: 'reset-password', component: ResetPassword }
   , { path: 'profile', component: Profile }
+  , { path: 'student-dashboard', component: StudentDashboardComponent, canActivate: [roleGuard('Student')] }
 ];

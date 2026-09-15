@@ -1,52 +1,43 @@
-<div class="dashboard bg-blue-100 p-4 rounded-lg">
-  <!-- Student information -->
-  <div class="student-info">
-    <h1>Welcome, {{ studentName() }}</h1>
-    <p>Credits Earned: {{ earnedCredits() }}</p>
-    <p>Graduation Status: 
-      <span [class.status-eligible]="graduationStatus() === 'Eligible for Graduation'"
-            [class.status-progress]="graduationStatus() !== 'Eligible for Graduation'">
-        {{ graduationStatus() }}
-      </span>
-    </p>
-    <button class="btn-primary" (click)="registerForClass()">
-      Register for a Class (+3 credits)
-    </button>
+<div class="max-w-5xl mx-auto p-6 bg-slate-50 min-h-screen">
+
+  <div class="bg-white rounded-xl shadow-sm p-6 mb-8 border border-slate-200">
+    <h1 class="text-2xl font-bold text-slate-800">Welcome, {{ auth.currentUser()?.displayName }}</h1>
+
+    @if (currentStudent(); as student) {
+      <div class="flex gap-6 mt-2 text-sm text-slate-500">
+        <span>Registration: <span class="text-slate-700 font-medium">{{ student.registrationNumber }}</span></span>
+        <span>GPA: <span class="text-slate-700 font-medium">{{ student.gpa }}</span></span>
+      </div>
+    } @else if (studentLoadError()) {
+      <p class="text-red-500 text-sm mt-2">{{ studentLoadError() }}</p>
+    }
   </div>
 
-  <!-- Course Catalog -->
-  <h2 class="text-lg text-green-500">Course Catalog</h2>
-
-  <!-- Loading state: show while fetching data from the API -->
-  @if (coursesResource.isLoading()) {
-    <div class="spinner">
-      Fetching courses from the server...
-    </div>
+  @if (enrollSuccess()) {
+    <p class="text-green-600 text-sm bg-green-50 border border-green-200 rounded-lg px-4 py-2 mb-4">{{ enrollSuccess() }}</p>
   }
-  <!-- Error state: show if the API request fails -->
-  @else if (coursesResource.error()) {
-    <div class="error">
+  @if (enrollError()) {
+    <p class="text-red-500 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2 mb-4">{{ enrollError() }}</p>
+  }
+
+  <h2 class="text-lg font-semibold text-slate-700 mb-4">Course Catalog</h2>
+
+  @if (coursesResource.isLoading()) {
+    <div class="text-slate-400 text-sm">Fetching courses from the server...</div>
+  } @else if (coursesResource.error()) {
+    <div class="text-red-500 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2">
       Could not load courses. Make sure your .NET API is running.
     </div>
-  }
-  <!-- Success state: courses loaded successfully -->
-  @else {
-    <div class="grid">
+  } @else {
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
       @for (course of coursesResource.value()!; track course.id) {
         <tms-course-card
           [course]="course"
           (enrollClicked)="handleEnroll($event)"
         />
       } @empty {
-        <p>No courses are available this term.</p>
+        <p class="text-slate-400 text-sm">No courses are available this term.</p>
       }
-    </div>
-  }
-
-  <!-- Show selected course info after enrollment -->
-  @if (selectedCourse(); as picked) {
-    <div class="selection-hint">
-      <p>Last enrollment request: <strong>{{ picked.title }}</strong> ({{ picked.code }})</p>
     </div>
   }
 </div>
