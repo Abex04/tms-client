@@ -13,7 +13,10 @@
   <ng-container matColumnDef="status">
     <th mat-header-cell *matHeaderCellDef mat-sort-header>Status</th>
     <td mat-cell *matCellDef="let row">
-      <span class="status-badge {{ row.status === 'Approved' ? 'approved' : 'pending' }}">
+      <span class="status-badge"
+        [class.approved]="row.status === 'Approved'"
+        [class.rejected]="row.status === 'Rejected'"
+        [class.pending]="row.status === 'Pending'">
         {{ row.status }}
       </span>
     </td>
@@ -23,7 +26,8 @@
     <th mat-header-cell *matHeaderCellDef>Actions</th>
     <td mat-cell *matCellDef="let row">
       @if (row.status === 'Pending') {
-        <button class="approve-btn" (click)="onApprove(row.id)">Approve</button>
+        <button class="approve-btn" (click)="onApprove(row)">Approve</button>
+        <button class="reject-btn" (click)="onReject(row)">Reject</button>
       }
     </td>
   </ng-container>

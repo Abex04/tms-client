@@ -33,10 +33,16 @@ export class EnrollmentListComponent {
       }
     });
   }
-  onApprove(id: number) {
+  onApprove(row: Enrollment) {
     this.store.approveEnrollment({
-      courseId: 1,
-      enrollmentId: id
+      courseId: row.courseId,
+      enrollmentId: row.id
+    });
+  }
+  onReject(row: Enrollment) {
+    this.store.rejectEnrollment({
+      courseId: row.courseId,
+      enrollmentId: row.id
     });
   }
 }

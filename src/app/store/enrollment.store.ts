@@ -19,21 +19,25 @@ export const EnrollmentStore = signalStore(
     api = inject(EnrollmentService),
     sync = inject(LiveSync)
   ) => ({
-    // Mock data for now — this store isn't wired to a real GET endpoint yet
-    // (a separate change outside this session's scope). What matters here
-    // is that approveEnrollment below now makes a REAL backend call.
-    // M12 Session 2: lets tests set up known entity state directly,
-    // without going through loadEnrollments()'s hardcoded mock data.
+    // Lets tests set up known entity state directly, without going
+    // through loadEnrollments()'s real HTTP call.
     seed: (rows: Enrollment[]) => {
       patchState(store, setAllEntities(rows));
     },
 
+    // Loads the real cross-course enrollment list from the backend
+    // (GET /api/enrollments), replacing the earlier hardcoded mock data -
+    // this is what makes approve/reject state actually survive a refresh.
     loadEnrollments: () => {
-      const mockData: Enrollment[] = [
-        { id: 1, studentId: 1, studentName: 'Alice Smith', courseId: 1, courseName: 'CS-101', status: 'Pending', enrolledAt: new Date().toISOString() },
-        { id: 2, studentId: 2, studentName: 'Bob Jones', courseId: 1, courseName: 'CS-101', status: 'Pending', enrolledAt: new Date().toISOString() }
-      ];
-      patchState(store, setAllEntities(mockData));
+      patchState(store, { isLoading: true, error: null });
+      api.getAll().subscribe({
+        next: (rows) => {
+          patchState(store, setAllEntities(rows), { isLoading: false });
+        },
+        error: (err) => {
+          patchState(store, { isLoading: false, error: err.message ?? 'Failed to load enrollments' });
+        }
+      });
     },
 
     // Now calls the real backend approve endpoint. On success, patches
@@ -47,6 +51,19 @@ export const EnrollmentStore = signalStore(
         },
         error: (err) => {
           patchState(store, { error: err.message ?? 'Failed to approve enrollment' });
+        }
+      });
+    },
+
+    // Mirrors approveEnrollment - same real backend call, same optimistic
+    // patch, same SignalR broadcast pattern, just for rejection.
+    rejectEnrollment: ({ courseId, enrollmentId }: { courseId: number; enrollmentId: number }) => {
+      api.reject(courseId, enrollmentId).subscribe({
+        next: () => {
+          patchState(store, updateEntity({ id: enrollmentId, changes: { status: 'Rejected' } }));
+        },
+        error: (err) => {
+          patchState(store, { error: err.message ?? 'Failed to reject enrollment' });
         }
       });
     },
