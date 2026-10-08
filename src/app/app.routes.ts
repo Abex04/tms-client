@@ -14,6 +14,7 @@ import { ResetPassword } from './features/reset-password/reset-password';
 import { Profile } from './features/profile/profile';
 import { StudentDashboardComponent } from './features/student-dashboard/student-dashboard.component';
 import { MySchedule } from './features/my-schedule/my-schedule';
+import { AdminCreateUser } from './features/admin-create-user/admin-create-user';
 
 export const routes: Routes = [
   { path: '', component: Welcome },
@@ -22,6 +23,7 @@ export const routes: Routes = [
   , { path: 'grade-submission', component: GradeSubmission }
   , { path: 'courses', component: CourseCatalog }
   , { path: 'admin/courses', component: AdminCourseList, canActivate: [roleGuard('Admin')] }
+  , { path: 'admin/create-user', component: AdminCreateUser, canActivate: [roleGuard('Admin')] }
   , { path: 'unauthorized', component: Unauthorized }
   , { path: 'login', component: Login }
   , { path: 'welcome', component: Welcome }

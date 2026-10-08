@@ -20,6 +20,25 @@ export interface RegisterDetails {
   password: string;
 }
 
+export interface AdminCreateUserDetails {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+  role: string;
+}
+
+export interface AdminCreateUserResult {
+  id: string;
+  email: string;
+  role: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+  resetToken?: string;
+}
+
 export interface AuthResponse {
   accessToken: string;
   refreshToken: string;
@@ -80,23 +99,27 @@ export class AuthService {
     );
   }
 
-  // Demo-mode forgot-password: the backend returns the reset token
-  // directly in the response instead of emailing it (no SMTP setup in
-  // this project). Returns the token so the ForgotPassword page can
-  // show it to the user, who then pastes it into the ResetPassword page.
-  async forgotPassword(email: string): Promise<{ message: string; resetToken?: string }> {
+  // Admin-only account creation. Unlike register(), the role here is a real
+  // form field - the backend enforces [Authorize(Roles = "Admin")] on this
+  // endpoint, so only an authenticated Admin can ever reach it successfully.
+  async adminCreateUser(details: AdminCreateUserDetails): Promise<AdminCreateUserResult> {
     return firstValueFrom(
-      this.http.post<{ message: string; resetToken?: string }>('/api/v2/auth/forgot-password', { email })
+      this.http.post<AdminCreateUserResult>('/api/v2/auth/admin-create-user', details)
+    );
+  }
+
+  // Demo-mode password reset request. The backend returns the reset token
+  // directly (no email/SMTP infrastructure in this project) so it can be
+  // shown on screen instead of emailed.
+  async forgotPassword(email: string): Promise<ForgotPasswordResponse> {
+    return firstValueFrom(
+      this.http.post<ForgotPasswordResponse>('/api/v2/auth/forgot-password', { email })
     );
   }
 
   async resetPassword(email: string, token: string, newPassword: string): Promise<void> {
     await firstValueFrom(
-      this.http.post('/api/v2/auth/reset-password', {
-        email,
-        token,
-        newPassword,
-      })
+      this.http.post('/api/v2/auth/reset-password', { email, token, newPassword })
     );
   }
 
