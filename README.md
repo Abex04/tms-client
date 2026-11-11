@@ -1,59 +1,36 @@
-# TmsClient
+# TMS Client
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.19.
+Angular frontend for the Training Management System (TMS). It works with the ASP.NET Core backend in [TmsApi](https://github.com/Abex04/TmsApi).
 
-## Development server
+## Features
 
-To start a local development server, run:
+- **Authentication:** login, sign-up with a password-strength meter, and a password reset flow (demo mode)
+- **Role-based access:** Student, Instructor, and Admin roles, with route guards
+- **Student dashboard:** browse and search the course catalog, enroll in courses, and view your schedule
+- **Instructor dashboard:** enrollment analytics, and approve or reject enrollment requests
+- **Admin tools:** create Instructor and Admin accounts, and manage courses
+- **Live updates:** students get an instant toast notification when an enrollment is approved or rejected (SignalR)
 
-```bash
-ng serve
-```
+## Tech stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+Angular 21 (standalone components and signals), NgRx SignalStore, Tailwind CSS 4, Angular Material, SignalR, Vitest, Playwright
 
-## Code scaffolding
+## Run locally
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+1. Start the backend from the TmsApi repo (it listens on http://localhost:5189).
+2. Install dependencies: `npm install`
+3. Start the app: `npm start`
+4. Open http://localhost:4200
 
-```bash
-ng generate component component-name
-```
+The dev server forwards `/api` and `/hubs` requests to the backend through `proxy.conf.json`.
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+## Tests
 
-```bash
-ng generate --help
-```
+- Unit tests: `npm test`
+- End-to-end tests: `npx playwright test`
 
-## Building
+The end-to-end tests need the backend running and a `.env` file in the project root containing two lines, `TMS_ADMIN_EMAIL` and `TMS_ADMIN_PASS`, set to an admin account's email and password.
 
-To build the project run:
+## Author
 
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-## Running end-to-end tests
-
-For end-to-end (e2e) testing, run:
-
-```bash
-ng e2e
-```
-
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
-
-## Additional Resources
-
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+Abebe Mihiretu
