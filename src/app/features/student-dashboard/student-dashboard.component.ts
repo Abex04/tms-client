@@ -1,4 +1,4 @@
-import { Component, inject, signal } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { CourseCardComponent } from '../../ui/course-card/course-card.component';
@@ -29,6 +29,23 @@ export class StudentDashboardComponent {
   coursesResource = rxResource({
     stream: () => this.courseApi.getAll(),
   });
+
+  // Catalog search: filters the loaded courses by title or code as the
+  // student types. Done in the browser - the full list is already loaded.
+  searchTerm = signal('');
+
+  filteredCourses = computed(() => {
+    const term = this.searchTerm().trim().toLowerCase();
+    const courses = this.coursesResource.value() ?? [];
+    if (!term) return courses;
+    return courses.filter(
+      (c) => c.title.toLowerCase().includes(term) || c.code.toLowerCase().includes(term)
+    );
+  });
+
+  onSearch(value: string) {
+    this.searchTerm.set(value);
+  }
 
   selectedCourse = signal<Course | null>(null);
   enrollError = signal('');

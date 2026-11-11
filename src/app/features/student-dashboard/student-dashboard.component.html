@@ -30,7 +30,22 @@
     <p class="text-red-500 text-sm bg-red-50 border border-red-200 rounded-lg px-4 py-2 mb-4">{{ enrollError() }}</p>
   }
 
-  <h2 class="text-lg font-semibold text-slate-700 mb-4">Course Catalog</h2>
+  <div class="flex items-center justify-between flex-wrap gap-3 mb-4">
+    <h2 class="text-lg font-semibold text-slate-700">Course Catalog</h2>
+
+    <div class="relative w-full sm:w-72">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11a6 6 0 11-12 0 6 6 0 0112 0z" />
+      </svg>
+      <input
+        type="search"
+        aria-label="Search courses"
+        placeholder="Search by title or code"
+        [value]="searchTerm()"
+        (input)="onSearch($any($event.target).value)"
+        class="w-full rounded-lg border border-slate-300 bg-white pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" />
+    </div>
+  </div>
 
   @if (coursesResource.isLoading()) {
     <div class="text-slate-400 text-sm">Fetching courses from the server...</div>
@@ -40,13 +55,17 @@
     </div>
   } @else {
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-      @for (course of coursesResource.value()!; track course.id) {
+      @for (course of filteredCourses(); track course.id) {
         <tms-course-card
           [course]="course"
           (enrollClicked)="handleEnroll($event)"
         />
       } @empty {
-        <p class="text-slate-400 text-sm">No courses are available this term.</p>
+        @if (searchTerm().trim()) {
+          <p class="text-slate-400 text-sm">No courses match "{{ searchTerm().trim() }}".</p>
+        } @else {
+          <p class="text-slate-400 text-sm">No courses are available this term.</p>
+        }
       }
     </div>
   }
