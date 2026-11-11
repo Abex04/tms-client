@@ -28,6 +28,10 @@ export class StudentNotifications {
 
     await this.refreshEnrollmentLookup();
 
+    // If the student logged out while the lookup was loading, stop() has
+    // already reset our state - don't start listening for them.
+    if (this.initializedForStudentId !== studentId) return;
+
     this.sync.connect();
     this.eventsSubscription?.unsubscribe();
     this.eventsSubscription = this.sync.events$.subscribe(async (event) => {
@@ -52,13 +56,27 @@ export class StudentNotifications {
     });
   }
 
+  // Called on logout: stop listening and forget the previous student's
+  // data, so toasts for them never appear on the login page or for the
+  // next person who logs in on the same browser.
+  stop(): void {
+    this.eventsSubscription?.unsubscribe();
+    this.eventsSubscription = null;
+    this.initializedForStudentId = null;
+    this.studentId = null;
+    this.courseNameByEnrollmentId.clear();
+  }
+
   private async refreshEnrollmentLookup(): Promise<void> {
     if (this.studentId == null) return;
+    const forStudentId = this.studentId;
     try {
       const all = await firstValueFrom(this.enrollmentApi.getAll());
+      // Ignore the result if the student changed or logged out meanwhile.
+      if (this.studentId !== forStudentId) return;
       this.courseNameByEnrollmentId.clear();
       for (const e of all) {
-        if (e.studentId === this.studentId) {
+        if (e.studentId === forStudentId) {
           this.courseNameByEnrollmentId.set(e.id, e.courseName);
         }
       }

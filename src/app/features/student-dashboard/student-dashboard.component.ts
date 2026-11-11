@@ -1,5 +1,5 @@
 import { Component, computed, inject, signal } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { CourseCardComponent } from '../../ui/course-card/course-card.component';
 import { Course } from '../../models/course.model';
@@ -18,6 +18,7 @@ export class StudentDashboardComponent {
   private courseApi = inject(CourseService);
   private enrollmentApi = inject(EnrollmentService);
   private studentsApi = inject(StudentsService);
+  private router = inject(Router);
   auth = inject(AuthService);
 
   // The logged-in user's linked Student domain record (id, registration
@@ -63,6 +64,11 @@ export class StudentDashboardComponent {
     } catch {
       this.studentLoadError.set('Could not load your student record.');
     }
+  }
+
+  logout(): void {
+    this.auth.logout();
+    this.router.navigate(['/']);
   }
 
   async handleEnroll(course: Course) {

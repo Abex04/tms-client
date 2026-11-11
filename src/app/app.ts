@@ -23,12 +23,15 @@ export class App {
     // enrollment status updates so they get a toast the moment an
     // instructor approves/rejects them - works on any page, since this
     // lives on the root component rather than one specific route.
+    // When nobody (or a non-student) is logged in, stop listening.
     effect(() => {
       const user = this.auth.currentUser();
       if (user?.role === 'Student') {
         this.studentsApi.getMe()
           .then((student) => this.studentNotifications.initialize(student.id))
           .catch(() => {});
+      } else {
+        this.studentNotifications.stop();
       }
     });
   }
